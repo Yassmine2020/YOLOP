@@ -120,11 +120,40 @@ def detect(cfg,opt):
         da_seg_mask = da_seg_mask.int().squeeze().cpu().numpy()
         # da_seg_mask = morphological_process(da_seg_mask, kernel_size=7)
 
-        
+##📛 TEST
+        # Directory where you want to save the image
+        save_directory = 'll_mask'
+
+        # Create the directory if it doesn't exist
+        if not os.path.exists(save_directory):
+            os.makedirs(save_directory)
+
+        # Define the output file path inside the new directory
+        output_path = os.path.join(save_directory, 'll_predict_output.png')
+
         ll_predict = ll_seg_out[:, :,pad_h:(height-pad_h),pad_w:(width-pad_w)]
+
+        # Convert predictions to most likely class if it's multi-channel
+        if ll_predict.shape[1] > 1:  # Assuming the channel dimension is 1
+            ll_predict_test = ll_predict.argmax(1)
+
+        # Convert to a suitable image format (0-255 range, uint8 type)
+            # to convert them to a NumPy array or use them with many other Python libraries, you need them on the CPU.
+        ll_predict_img = ll_predict_test.squeeze().cpu().numpy()  # Squeeze [H,W] if it has a singleton dimension
+        ll_predict_img = (ll_predict_img * 255 / ll_predict_img.max()).astype(np.uint8)  # Scale to 0-255
+
+        # Save the image
+        cv2.imwrite(output_path, ll_predict_img)
+
+##📛 TEST
+
+        # # ❌❌Act here: decomment this t return to the original!!
+        # ll_predict = ll_seg_out[:, :,pad_h:(height-pad_h),pad_w:(width-pad_w)]
         ll_seg_mask = torch.nn.functional.interpolate(ll_predict, scale_factor=int(1/ratio), mode='bilinear')
         _, ll_seg_mask = torch.max(ll_seg_mask, 1)
-        ll_seg_mask = ll_seg_mask.int().squeeze().cpu().numpy()
+        ll_seg_mask = ll_seg_mask.int().squeeze().cpu().numpy()    ## ➡️ to numpy
+        # # ❌❌Act here !!
+
         # Lane line post-processing
         #ll_seg_mask = morphological_process(ll_seg_mask, kernel_size=7, func_type=cv2.MORPH_OPEN)
         #ll_seg_mask = connect_lane(ll_seg_mask)
