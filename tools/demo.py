@@ -119,23 +119,15 @@ def detect(cfg,opt):
         pad_h = int(pad_h)
         ratio = shapes[1][0][1]
 
-        da_predict = da_seg_out[:, :, pad_h:(height-pad_h),pad_w:(width-pad_w)]
-        da_seg_mask = torch.nn.functional.interpolate(da_predict, scale_factor=int(1/ratio), mode='bilinear')
-        _, da_seg_mask = torch.max(da_seg_mask, 1)
-        da_seg_mask = da_seg_mask.int().squeeze().cpu().numpy()
+        # # ❌❌Act here: decomment this t return to the original!!
+        # da_predict = da_seg_out[:, :, pad_h:(height-pad_h),pad_w:(width-pad_w)]
+        # da_seg_mask = torch.nn.functional.interpolate(da_predict, scale_factor=int(1/ratio), mode='bilinear')
+        # _, da_seg_mask = torch.max(da_seg_mask, 1)
+        # da_seg_mask = da_seg_mask.int().squeeze().cpu().numpy()
         # da_seg_mask = morphological_process(da_seg_mask, kernel_size=7)
+        # # ❌❌Act here: decomment this t return to the original!!
 
 ##📛 TEST
-        # # Directory where you want to save the image
-        # save_directory = 'll_mask'
-
-        # # Create the directory if it doesn't exist
-        # if not os.path.exists(save_directory):
-        #     os.makedirs(save_directory)
-
-        # # Define the output file path inside the new directory
-        # output_path = os.path.join(save_directory, 'll_predict_output.png')
-
         ll_predict = ll_seg_out[:, :,pad_h:(height-pad_h),pad_w:(width-pad_w)]
 
         # Convert predictions to most likely class if it's multi-channel
@@ -147,54 +139,53 @@ def detect(cfg,opt):
         ll_predict_img = ll_predict_test.squeeze().cpu().numpy()  # Squeeze [H,W] if it has a singleton dimension
         ll_predict_img = (ll_predict_img * 255 / ll_predict_img.max()).astype(np.uint8)  # Scale to 0-255
 
-        extract_data(ll_predict_img)     
-
-        # # Save the image
-        # cv2.imwrite(output_path, ll_predict_img)
+        img_det = extract_data(ll_predict_img)        
 
 ##📛 TEST
 
-    #     # # ❌❌Act here: decomment this t return to the original!!
-    #     # ll_predict = ll_seg_out[:, :,pad_h:(height-pad_h),pad_w:(width-pad_w)]
-    #     ll_seg_mask = torch.nn.functional.interpolate(ll_predict, scale_factor=int(1/ratio), mode='bilinear')
-    #     _, ll_seg_mask = torch.max(ll_seg_mask, 1)
-    #     ll_seg_mask = ll_seg_mask.int().squeeze().cpu().numpy()    ## ➡️ to numpy
-    #     # # ❌❌Act here !!
+        # # ❌❌Act here: decomment this t return to the original!!
+        # ll_predict = ll_seg_out[:, :,pad_h:(height-pad_h),pad_w:(width-pad_w)]
+        # ll_seg_mask = torch.nn.functional.interpolate(ll_predict, scale_factor=int(1/ratio), mode='bilinear')
+        # _, ll_seg_mask = torch.max(ll_seg_mask, 1)
+        # ll_seg_mask = ll_seg_mask.int().squeeze().cpu().numpy()    ## ➡️ to numpy
 
-    #     # Lane line post-processing
-    #     #ll_seg_mask = morphological_process(ll_seg_mask, kernel_size=7, func_type=cv2.MORPH_OPEN)
-    #     #ll_seg_mask = connect_lane(ll_seg_mask)
+        # Lane line post-processing
+        #ll_seg_mask = morphological_process(ll_seg_mask, kernel_size=7, func_type=cv2.MORPH_OPEN)
+        #ll_seg_mask = connect_lane(ll_seg_mask)
 
-    #     img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True)
+        # img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True)
+        # img_det = show_seg_result(img_det, (ll_seg_mask, None), _, _, is_demo=True) 
 
-    #     if len(det):
-    #         det[:,:4] = scale_coords(img.shape[2:],det[:,:4],img_det.shape).round()
-    #         for *xyxy,conf,cls in reversed(det):
-    #             label_det_pred = f'{names[int(cls)]} {conf:.2f}'
-    #             plot_one_box(xyxy, img_det , label=label_det_pred, color=colors[int(cls)], line_thickness=2)
+        # # ❌❌Act here !!
+
+        if len(det):
+            det[:,:4] = scale_coords(img.shape[2:],det[:,:4],img_det.shape).round()
+            for *xyxy,conf,cls in reversed(det):
+                label_det_pred = f'{names[int(cls)]} {conf:.2f}'
+                plot_one_box(xyxy, img_det , label=label_det_pred, color=colors[int(cls)], line_thickness=2)
         
-    #     if dataset.mode == 'images':
-    #         cv2.imwrite(save_path,img_det)
+        if dataset.mode == 'images':
+            cv2.imwrite(save_path,img_det)
 
-    #     elif dataset.mode == 'video':
-    #         if vid_path != save_path:  # new video
-    #             vid_path = save_path
-    #             if isinstance(vid_writer, cv2.VideoWriter):
-    #                 vid_writer.release()  # release previous video writer
+        elif dataset.mode == 'video':
+            if vid_path != save_path:  # new video
+                vid_path = save_path
+                if isinstance(vid_writer, cv2.VideoWriter):
+                    vid_writer.release()  # release previous video writer
 
-    #             fourcc = 'mp4v'  # output video codec
-    #             fps = vid_cap.get(cv2.CAP_PROP_FPS)
-    #             h,w,_=img_det.shape
-    #             vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*fourcc), fps, (w, h))
-    #         vid_writer.write(img_det)
+                fourcc = 'mp4v'  # output video codec
+                fps = vid_cap.get(cv2.CAP_PROP_FPS)
+                h,w,_=img_det.shape
+                vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*fourcc), fps, (w, h))
+            vid_writer.write(img_det)
         
-    #     else:
-    #         cv2.imshow('image', img_det)
-    #         cv2.waitKey(1)  # 1 millisecond
+        else:
+            cv2.imshow('image', img_det)
+            cv2.waitKey(1)  # 1 millisecond
 
-    # print('Results saved to %s' % Path(opt.save_dir))
-    # print('Done. (%.3fs)' % (time.time() - t0))
-    # print('inf : (%.4fs/frame)   nms : (%.4fs/frame)' % (inf_time.avg,nms_time.avg))
+    print('Results saved to %s' % Path(opt.save_dir))
+    print('Done. (%.3fs)' % (time.time() - t0))
+    print('inf : (%.4fs/frame)   nms : (%.4fs/frame)' % (inf_time.avg,nms_time.avg))
 
 
 

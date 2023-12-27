@@ -4,27 +4,6 @@ import numpy as np
 import os
 import math
 
-# Directory where you want to save the image
-# save_directory = 'blured_mask'
-# eroded_directory = 'eroded_mask'
-# edges_directory = 'edges_mask'
-output_folder = 'final_trans'
-
-
-
-# Create the directory if it doesn't exist
-# if not os.path.exists(save_directory):
-#     os.makedirs(save_directory)
-
-# if not os.path.exists(edges_directory):
-#     os.makedirs(edges_directory)
-
-# if not os.path.exists(eroded_directory):
-#     os.makedirs(eroded_directory)
-
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
-
 def angle_between_line_and_vertical_line(m):
     angle_radians = math.atan(m)
     angle_degrees = math.degrees(angle_radians)
@@ -52,22 +31,13 @@ def extract_data(image):
     height, width = image.shape
     # Blur the img
     blurred = cv2.GaussianBlur(image, (5, 5), 0)
-    # blured_path = os.path.join(save_directory, 'll_predict_output.png')
-    # cv2.imwrite(blured_path, blurred)
 
     # Erode the blurred image
     kernel = np.ones((7, 7), np.uint8)
     erosion = cv2.erode(blurred, kernel, iterations=1)
-    # eroded_path = os.path.join(eroded_directory, 'll_eroded_output.png')
-    # cv2.imwrite(eroded_path, erosion)
 
     # Detect edges on the eroded image
     edges = cv2.Canny(erosion, 50, 80)
-
-    # Save the edges image
-    # edges_filename = os.path.join(edges_directory, 'll_edged_output.png')
-    # cv2.imwrite(edges_filename, edges)
-
 
     # Apply the Hough Line Transform to detect lines
     print('✅ here: hought transform')
@@ -135,9 +105,8 @@ def extract_data(image):
         x2_alpha, y2_alpha = alpha_line(x1_alpha, y1_alpha, alpha)[1]
         cv2.line(color_image, (x1_alpha, y1_alpha), (x2_alpha, y1_alpha - abs(y2_alpha - y1_alpha)), (255, 0, 0), 5)  # alpha line
         cv2.line(color_image, (x1_alpha, y1_alpha), (x1_alpha, y1_alpha - (y2_alpha - y1_alpha)), (255, 0, 100), 5)  # vertical line
-        
-        output_filename = os.path.join(output_folder, 'final_output.png')
-        cv2.imwrite(output_filename, color_image)
 
     else:
         print("▶️ Line is  None")
+
+    return color_image
