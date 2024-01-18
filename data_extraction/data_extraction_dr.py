@@ -12,9 +12,6 @@ def angle_between_line_and_vertical_line(m):
 
 def alpha_line(x, y, alpha):
 
-    if math.isnan(alpha):
-        return 0, 0
-
     length=150
     # Convert angle from degrees to radians
     alpha_rad = np.radians(alpha)
@@ -75,15 +72,11 @@ def extract_data(image):
 
         # Function to calculate y for a given x using the line equation
         def calculate_y(m, n, x):
-            if math.isnan(m) or math.isnan(n):
-                return 0
             y = int(n * x + m)
             return y
         
         # Function to calculate x for a given y using the line equation
         def calculate_x(m, n, y):
-            if math.isnan(m) or math.isnan(n):
-                return 0
             return int((y - m) / n) if n != 0 else 0
     #     def calculate_x(y, m, n):
     # # Check if any of the inputs are NaN
@@ -124,6 +117,6 @@ def extract_data(image):
         cv2.line(color_image, (x1_alpha, y1_alpha), (x1_alpha, y1_alpha - (y2_alpha - y1_alpha)), (255, 0, 100), 5)  # vertical line
 
     else:
-        print('▶️ alpha:', 100)
+        print("▶️ Line is  None")
 
     return color_image
