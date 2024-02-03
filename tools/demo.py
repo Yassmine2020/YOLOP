@@ -29,9 +29,11 @@ from lib.core.function import AverageMeter
 from lib.core.postprocess import morphological_process, connect_lane
 from tqdm import tqdm
 
-# 📛 TEST
+# # 📛 TEST
 from data_extraction.data_extraction import *
-# 📛 TEST
+# import serial 
+# arduino = serial.Serial(port='COM8', baudrate=9600, timeout=.1) 
+# # 📛 TEST
 
 normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
@@ -140,7 +142,8 @@ def detect(cfg,opt):
         ll_predict_img = (ll_predict_img * 255 / ll_predict_img.max()).astype(np.uint8)  # Scale to 0-255
 
         img_det = extract_data(ll_predict_img)        
-
+        # arduino.write(str(alpha_det).encode())
+        # print('▶️ data', arduino.readline())
 ##📛 TEST
 
         # # ❌❌Act here: decomment this t return to the original!!
