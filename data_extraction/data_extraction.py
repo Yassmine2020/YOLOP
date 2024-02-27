@@ -25,12 +25,12 @@ def angle_between_line_and_vertical_line(m):
     angle_degrees = math.degrees(angle_radians)
     return angle_degrees
 
-def alpha_line(x, y, alpha):
+def alpha_line(x, y, alpha_val):
 
     try:
         length=150
         # Convert angle from degrees to radians
-        alpha_rad = np.radians(alpha)
+        alpha_rad = np.radians(alpha_val)
 
         # Calculate direction vector (dx, dy)
         # Since alpha is with respect to vertical, we swap sin and cos
@@ -139,4 +139,4 @@ def extract_data(image):
     except Exception as e:
         print(f"❌ Error calculating alpha: {e}")
 
-    return color_image
+    return color_image       # 📛 TEST
